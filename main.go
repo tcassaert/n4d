@@ -71,14 +71,14 @@ func main() {
 				}
 
 				alloc_json, err := json.Marshal(alloc)
-				var allocations api.Allocation
-				err = json.Unmarshal(alloc_json, &allocations)
+				var allocation api.Allocation
+				err = json.Unmarshal(alloc_json, &allocation)
 
 				if err != nil {
 					stream.L.Error("Error parsing JSON", "error", err)
 				}
 
-				taskstate_json, err := json.Marshal(allocations.TaskStates)
+				taskstate_json, err := json.Marshal(allocation.TaskStates)
 				var taskstates api.TaskState
 				err = json.Unmarshal(taskstate_json, &taskstates)
 
@@ -94,19 +94,19 @@ func main() {
 					stream.L.Error("Error parsing JSON", "error", err)
 				}
 
-				if allocations.TaskStates[allocations.JobID] != nil {
-					events_length := len(allocations.TaskStates[allocations.JobID].Events)
-					timestamp := time.Unix(0, allocations.TaskStates[allocations.JobID].Events[events_length-1].Time)
+				for taskName, _ := range allocation.TaskStates {
+					events_length := len(allocation.TaskStates[taskName].Events)
+					timestamp := time.Unix(0, allocation.TaskStates[taskName].Events[events_length-1].Time)
 					fmt.Printf("timestamp=%s, node=%s, alloc_id=%s, job_id=%s, namespace=%s, job_status=%s, task_state=%s, event_type=%s, event=%s \n",
 						timestamp,
-						allocations.NodeName,
-						allocations.ID,
-						allocations.JobID,
-						allocations.Namespace,
-						allocations.ClientStatus,
-						allocations.TaskStates[allocations.JobID].State,
-						allocations.TaskStates[allocations.JobID].Events[events_length-1].Type,
-						allocations.TaskStates[allocations.JobID].Events[events_length-1].DisplayMessage,
+						allocation.NodeName,
+						allocation.ID,
+						allocation.JobID,
+						allocation.Namespace,
+						allocation.ClientStatus,
+						allocation.TaskStates[taskName].State,
+						allocation.TaskStates[taskName].Events[events_length-1].Type,
+						allocation.TaskStates[taskName].Events[events_length-1].DisplayMessage,
 					)
 				}
 			}
