@@ -97,11 +97,12 @@ func main() {
 				for taskName, _ := range allocation.TaskStates {
 					events_length := len(allocation.TaskStates[taskName].Events)
 					timestamp := time.Unix(0, allocation.TaskStates[taskName].Events[events_length-1].Time)
-					fmt.Printf("timestamp=%s, node=%s, alloc_id=%s, job_id=%s, namespace=%s, job_status=%s, task_state=%s, event_type=%s, event=%s \n",
+					fmt.Printf("timestamp=%s, node=%s, alloc_id=%s, job_id=%s, task_id=%s namespace=%s, job_status=%s, task_state=%s, event_type=%s, event=%s \n",
 						timestamp,
 						allocation.NodeName,
 						allocation.ID,
 						allocation.JobID,
+						taskName,
 						allocation.Namespace,
 						allocation.ClientStatus,
 						allocation.TaskStates[taskName].State,
