@@ -94,21 +94,31 @@ func main() {
 					stream.L.Error("Error parsing JSON", "error", err)
 				}
 
+				var timestampSlice []int64
+				var latestTimestamp int64
 				for taskName, _ := range allocation.TaskStates {
-					events_length := len(allocation.TaskStates[taskName].Events)
-					timestamp := time.Unix(0, allocation.TaskStates[taskName].Events[events_length-1].Time)
-					fmt.Printf("timestamp=%s, node=%s, alloc_id=%s, job_id=%s, task_id=%s namespace=%s, job_status=%s, task_state=%s, event_type=%s, event=%s \n",
-						timestamp,
-						allocation.NodeName,
-						allocation.ID,
-						allocation.JobID,
-						taskName,
-						allocation.Namespace,
-						allocation.ClientStatus,
-						allocation.TaskStates[taskName].State,
-						allocation.TaskStates[taskName].Events[events_length-1].Type,
-						allocation.TaskStates[taskName].Events[events_length-1].DisplayMessage,
-					)
+					eventsLength := len(allocation.TaskStates[taskName].Events)
+					timestampSlice = append(timestampSlice, allocation.TaskStates[taskName].Events[eventsLength-1].Time)
+					latestTimestamp = sliceMax(timestampSlice)
+
+				}
+				for taskName, _ := range allocation.TaskStates {
+					eventsLength := len(allocation.TaskStates[taskName].Events)
+					if allocation.TaskStates[taskName].Events[eventsLength-1].Time == latestTimestamp {
+						timestamp := time.Unix(0, allocation.TaskStates[taskName].Events[eventsLength-1].Time)
+						fmt.Printf("timestamp=%s, node=%s, alloc_id=%s, job_id=%s, task_id=%s namespace=%s, job_status=%s, task_state=%s, event_type=%s, event=%s \n",
+							timestamp,
+							allocation.NodeName,
+							allocation.ID,
+							allocation.JobID,
+							taskName,
+							allocation.Namespace,
+							allocation.ClientStatus,
+							allocation.TaskStates[taskName].State,
+							allocation.TaskStates[taskName].Events[eventsLength-1].Type,
+							allocation.TaskStates[taskName].Events[eventsLength-1].DisplayMessage,
+						)
+					}
 				}
 			}
 		}
@@ -149,4 +159,14 @@ func CtxWithInterrupt(ctx context.Context) (context.Context, func()) {
 		signal.Stop(ch)
 		cancel()
 	}
+}
+
+func sliceMax(slice []int64) int64 {
+	var max int64 = slice[0]
+	for _, value := range slice {
+		if max < value {
+			max = value
+		}
+	}
+	return max
 }
