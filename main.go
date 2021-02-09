@@ -55,7 +55,7 @@ func main() {
 			return
 		case event := <-eventCh:
 			if event.Err != nil {
-				stream.L.Warn("Error from event stream", "error", err)
+				stream.L.Warn("Error from event stream", "error", event.Err)
 				break
 			}
 
