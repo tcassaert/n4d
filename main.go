@@ -43,12 +43,14 @@ func main() {
 	topics := map[api.Topic][]string{
 		api.Topic("Allocation"): {*job},
 	}
+	stream.L.Info("Creating event stream client...")
 	eventCh, err := events.Stream(ctx, topics, 0, &api.QueryOptions{})
 	if err != nil {
 		stream.L.Error("Error creating event stream client", "error", err)
 		os.Exit(1)
 	}
 
+	stream.L.Info("Event stream client created.")
 	for {
 		select {
 		case <-ctx.Done():
